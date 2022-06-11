@@ -1,0 +1,38 @@
+//@version=4
+study(title="ADV RSI", shorttitle="ADV RSI", format=format.price, precision=0, resolution="")
+src = input(close, "Source", type = input.source)
+len = input(14, minval=1, title="Length")
+up = rma(max(change(src), 0), len)
+down = rma(-min(change(src), 0), len)
+rsi = down == 0 ? 100 : up == 0 ? 0 : 100 - (100 / (1 + up / down))
+p1 = plot(rsi, "RSI", color=#ffffff, linewidth=2)
+bandm = hline(50, "Middle Band", color=color.new(#C0C0C0, 50))
+// MA on RSI
+maLen = input(21, minval=1, title="EMA On RSI")
+ma = ema(rsi, maLen)
+p2 = plot(ma, color= rsi >= ma ? #00ff00:#ff0000, title="EMA On RSI", linewidth=1, transp=20)
+fill(p1, p2, color = rsi > ma ? #80ff00 : #ff0000)
+// INPUT
+res1 = input(title="Resolution 1", type=input.resolution, defval="5")
+res2 = input(title="Resolution 2", type=input.resolution, defval="15")
+allowRepainting = input(true, "Allow Repainting?")
+// CALC
+rsi1 = allowRepainting ? security(syminfo.tickerid, res1, rsi) : security(syminfo.tickerid, res1, rsi[1], barmerge.lookahead_on)
+rsi2 = allowRepainting ? security(syminfo.tickerid, res2, rsi) : security(syminfo.tickerid, res2, rsi[1], barmerge.lookahead_on)
+// PLOT
+rsi1Color = rsi1 >= 50 ? #88ff88 : #ff8888
+rsi2Color = rsi2 >= 50 ? #88ff88 : #ff8888
+
+
+h100 = hline(100)
+h70 = hline(70)
+h61 = hline(61)
+h60 = hline(60)
+h40 = hline(40)
+h39 = hline(39)
+h30 = hline(30)
+h0 = hline(0)
+fill(h100,h70, #ffc400, transp=98)
+fill(h61,h60, #80ff00, transp=20)
+fill(h40,h39, #ff0000, transp=33)
+fill(h30,h0, #00c3ff, transp=98)
