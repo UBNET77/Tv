@@ -1,0 +1,40 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0
+// https://mozilla.org/MPL/2.0/
+
+//@version=4
+strategy("Double 7s", overlay=true)
+
+// The strategy range (dates)
+testStartYear = input(1990, "Backtest Start Year")
+testStartMonth = input(01, "Backtest Start Month")
+testStartDay = input(1, "Backtest Start Day")
+testPeriodStart = timestamp(testStartYear, testStartMonth, testStartDay, 0, 0)
+
+testStopYear = input(2022, "Backtest Stop Year")
+testStopMonth = input(12, "Backtest Stop Month")
+testStopDay = input(30, "Backtest Stop Day")
+testPeriodStop = timestamp(testStopYear, testStopMonth, testStopDay, 0, 0)
+
+// A switch to control background coloring of the test period
+testPeriodBackground = input(title="Color Background?", type=input.bool, defval=true)
+testPeriodBackgroundColor = testPeriodBackground and time >= testPeriodStart and time <= testPeriodStop ? #6c6f6c : na
+bgcolor(testPeriodBackgroundColor, transp=97)
+
+// The Doubles value
+// Usually Double 7's but can be Double 5's, 6's, 8's, 9's, and 10's
+doublesVal = input(title="Doubles Value", type=input.integer, defval=7, minval=5, maxval=10)
+
+// Determine if current bar is within range
+// @returns boolean true or false
+testPeriod() =>
+    time >= testPeriodStart and time <= testPeriodStop ? true : false
+
+longSMA = sma(close, 200)  // 200-day moving average
+highest_close = highest(close, doublesVal) // price of highest close
+lowest_close = lowest(close, doublesVal) // price of lowest close
+
+longCondition = close > longSMA  // Phase One Entry Condition
+
+if longCondition and testPeriod()
+    strategy.entry("CALL", strategy.long, 100, when=close == lowest_close)
+    strategy.close("CALL", when=close == highest_close)
