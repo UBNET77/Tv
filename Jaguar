@@ -1,0 +1,38 @@
+//@version=3
+study(title="Jaguar", overlay=true)
+src=close
+smoothrng(x, t, m)=>
+    wper      = (t*2) - 1
+    avrng     = ema(abs(x - x[1]), t)
+    smoothrng = ema(avrng, wper)*m
+    smoothrng
+smrng = smoothrng(src, 100, 2.5)
+rngfilt(x, r)=>
+    rngfilt  = x
+    rngfilt := x > nz(rngfilt[1]) ? ((x - r) < nz(rngfilt[1]) ? nz(rngfilt[1]) : (x - r)) : ((x + r) > nz(rngfilt[1]) ? nz(rngfilt[1]) : (x + r))
+    rngfilt
+filt = rngfilt(src, smrng)
+upward   = 0.0
+upward  := filt > filt[1] ? nz(upward[1]) + 1 : filt < filt[1] ? 0 : nz(upward[1])
+downward = 0.0
+downward := filt < filt[1] ? nz(downward[1]) + 1 : filt > filt[1] ? 0 : nz(downward[1])
+hband = filt + smrng
+lband = filt - smrng
+filtcolor = upward > 0 ? lime : downward > 0 ? red : orange
+barcolor  = (src > filt) and (src > src[1]) and (upward > 0) ? lime : (src > filt) and (src < src[1]) and (upward > 0) ? gray : 
+   (src < filt) and (src < src[1]) and (downward > 0) ? red : (src < filt) and (src > src[1]) and (downward > 0) ? gray : gray
+barcolor(barcolor)
+longCond = na
+shortCond = na
+longCond := ((src > filt) and (src > src[1]) and (upward > 0)) or ((src > filt) and (src < src[1]) and (upward > 0)) 
+shortCond := ((src < filt) and (src < src[1]) and (downward > 0)) or ((src < filt) and (src > src[1]) and (downward > 0))
+CondIni = 0
+CondIni := longCond ? 1 : shortCond ? -1 : CondIni[1]
+longCondition = longCond and CondIni[1] == -1
+shortCondition = shortCond and CondIni[1] == 1
+plotshape(longCondition, title = "Buy Signal", text ="BUY", textcolor = white, style=shape.labelup, size = size.normal, location=location.belowbar, color = green, transp = 0)
+plotshape(shortCondition, title = "Sell Signal", text ="SELL", textcolor = white, style=shape.labeldown, size = size.normal, location=location.abovebar, color = red, transp = 0)
+alertcondition(longCondition, title="Buy Alert", message = "BUY")
+alertcondition(longCondition, title="Buy Alert", message = "BUY")
+alertcondition(longCondition, title="Buy Alert", message = "BUY")
+alertcondition(shortCondition, title="Sell Alert", message = "SELL")
