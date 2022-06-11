@@ -1,5 +1,5 @@
 //@version=4
-study("HalfTrend", overlay=true)
+study("Zee Trend", overlay=true)
 
 amplitude = input(title="Amplitude", defval=1)
 channelDeviation = input(title="Channel Deviation", defval=2)
