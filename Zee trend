@@ -1,7 +1,7 @@
 //@version=4
 study("Zee Trend", overlay=true)
 
-amplitude = input(title="Amplitude", defval=1)
+amplitude = input(title="Amplitude", defval=3)
 channelDeviation = input(title="Channel Deviation", defval=2)
 showArrows = input(title="Show Arrows", defval=true)
 showChannels = input(title="Show Channels", defval=false)
